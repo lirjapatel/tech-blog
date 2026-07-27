@@ -9,6 +9,7 @@ genuinely interactive.
 **Content editor:** https://lirja-tech-blog.netlify.app/admin/
 **Editor's guide:** https://lirja-tech-blog.netlify.app/editing
 
+
 ---
 
 ## What this project demonstrates
