@@ -96,15 +96,22 @@ server hot-reloads.
 
 ### In production
 
-`/admin` uses Netlify Identity + Git Gateway: editors sign in with an email address and never see
-GitHub. Publishing commits to `main`, which triggers a rebuild.
+The deployed `/admin` deliberately has no login, and says so when you open it.
 
-To enable it:
+`public/admin/config.yml` targets Decap's `git-gateway` backend, which authenticates through
+**Netlify Identity — no longer provisioned on Netlify's free tier**. Rather than boot an editor
+that can only produce an auth error, the deployed page explains the constraint and points at the
+local workflow. The 5 MB CMS bundle is not requested on a page that cannot use it.
 
-1. Netlify → **Site configuration → Identity** → enable Identity.
-2. Under **Registration**, set *Invite only*.
-3. Under **Services → Git Gateway**, enable it.
-4. Invite editors by email.
+Two options for a real production login, neither needed to demonstrate the editor:
+
+| Option | Cost | Trade-off |
+| --- | --- | --- |
+| **Netlify Identity + Git Gateway** | paid plan | Zero code. Editors sign in by email and never see GitHub. |
+| **GitHub OAuth** (`backend: github`) | free | Needs a GitHub OAuth app and a small auth service — two Netlify Functions. Editors need GitHub accounts. |
+
+For a marketing team, Identity is worth the money: "sign in with your work email" is the whole
+point, and asking non-developers to hold GitHub accounts defeats it.
 
 ### Directly in Markdown
 

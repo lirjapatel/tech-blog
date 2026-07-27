@@ -7,92 +7,178 @@
     <title>Content editor — Lirja Patel</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <style>
+      :root {
+        --ink: #221d18;
+        --muted: #57534e;
+        --line: #e6dccd;
+        --primary: #0f766e;
+        --paper: #fbf9f5;
+      }
       body {
         margin: 0;
         font-family: Inter, system-ui, sans-serif;
+        color: var(--ink);
+        background: var(--paper);
       }
       #cms-loading {
         display: grid;
         place-items: center;
         height: 100vh;
         gap: 0.75rem;
-        color: #57534e;
+        color: var(--muted);
         text-align: center;
         padding: 1.5rem;
       }
       #cms-loading strong {
         font-size: 1.05rem;
-        color: #1c1917;
+        color: var(--ink);
       }
-      #cms-loading code {
-        background: #f5f5f4;
+      code {
+        background: #f0ebe2;
         padding: 0.15rem 0.4rem;
         border-radius: 4px;
-        font-size: 0.85rem;
+        font-size: 0.9em;
+        font-family: ui-monospace, monospace;
       }
-      /* Only one of these is ever shown; picked at runtime below. */
-      .cms-hint {
+      /* Shown only on the deployed site; see the script at the end of <body>. */
+      #cms-unavailable {
         display: none;
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: 4rem 1.5rem;
+        line-height: 1.65;
+      }
+      #cms-unavailable h1 {
+        font-family: Fraunces, Georgia, serif;
+        font-size: 2rem;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        margin: 0 0 1rem;
+      }
+      #cms-unavailable p {
+        color: var(--muted);
+        margin: 0 0 1rem;
+      }
+      #cms-unavailable pre {
+        background: #201b16;
+        color: #f6f1e9;
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        overflow-x: auto;
+        font-size: 0.875rem;
+        font-family: ui-monospace, monospace;
+      }
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 1.5rem;
+        background: #fff;
+        margin: 1.5rem 0;
+      }
+      .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.28em;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin: 0 0 0.75rem;
+      }
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 2rem;
+      }
+      .links a {
+        color: var(--primary);
+        font-weight: 500;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(15, 118, 110, 0.3);
+      }
+      .links a:hover {
+        border-bottom-color: var(--primary);
       }
     </style>
   </head>
   <body>
     <!--
       Decap renders into #nc-root, and React replaces whatever children this
-      element already has. Putting the loading state *inside* it means the CMS
-      clears it automatically on mount.
-
-      This previously sat outside #nc-root, so it was never removed — and since
-      it is 100vh, it covered the viewport and pushed the real editor below the
-      fold. The CMS looked like it was hanging when it had actually booted fine.
+      element already has, so the loading state belongs inside it. When this sat
+      outside, nothing ever removed it — and at 100vh it covered the viewport and
+      pushed the booted editor below the fold, making /admin look like it hung.
     -->
     <div id="nc-root">
       <div id="cms-loading">
         <strong>Loading the content editor…</strong>
-        <span class="cms-hint" data-hint="local">
-          If this message persists, run <code>npm run cms</code> in a second terminal, then reload.
-        </span>
-        <span class="cms-hint" data-hint="deployed">
-          If this message persists, the editor could not reach its login service.
-        </span>
+        <span>If this message persists, run <code>npm run cms</code>, then reload.</span>
       </div>
     </div>
 
+    <!--
+      The deployed site has no CMS login. Decap's git-gateway backend requires
+      Netlify Identity, which Netlify no longer provisions on free plans — so
+      booting Decap here would only ever produce an authentication error. Saying
+      that plainly is more useful than letting a visitor hit a dead end.
+    -->
+    <main id="cms-unavailable">
+      <p class="eyebrow">Content editor</p>
+      <h1>This editor runs locally, not on the deployed site.</h1>
+      <p>
+        The CMS behind this site is <strong>Decap</strong>, a git-based editor: an author writes in
+        a normal rich-text UI, and publishing commits Markdown to the repository. That commit
+        triggers a rebuild, so content ships without a developer involved.
+      </p>
+
+      <div class="panel">
+        <p class="eyebrow">Why there is no login here</p>
+        <p style="margin-bottom: 0">
+          Decap's <code>git-gateway</code> backend authenticates through Netlify Identity, which is
+          no longer available on Netlify's free tier. The alternative is a GitHub OAuth app, which
+          means running a small auth service. Neither is needed to demonstrate the editor, so this
+          deployment simply doesn't enable one.
+        </p>
+      </div>
+
+      <p>Running it locally needs no accounts, no network, and no login at all:</p>
+      <pre><code>npm run cms   # CMS backend on :8081
+npm run dev   # the site on :4321</code></pre>
+      <p>
+        Then open <code>localhost:4321/admin/</code>. The editor reads and writes the real Markdown
+        files in <code>src/content/blog/</code> — saving a post writes a file, and the dev server
+        hot-reloads it.
+      </p>
+
+      <div class="links">
+        <a href="/editing">Read the editor's guide</a>
+        <a href="https://github.com/lirjapatel/tech-blog">View the source</a>
+        <a href="/">Back to the site</a>
+      </div>
+    </main>
+
     <script>
-      // The `npm run cms` hint is only true on a developer's machine. Telling a
-      // deployed visitor to run a terminal command is nonsense, so pick the
-      // hint that matches where this page is actually being served from.
+      // Only boot Decap where it can actually work. On the deployed site the
+      // scripts below are never requested at all, which also keeps a 5 MB
+      // bundle off a page that cannot use it.
       ;(function () {
         var isLocal = ['localhost', '127.0.0.1', '[::1]'].indexOf(window.location.hostname) !== -1
-        var hint = document.querySelector('[data-hint="' + (isLocal ? 'local' : 'deployed') + '"]')
-        if (hint) hint.style.display = 'block'
+
+        if (!isLocal) {
+          document.getElementById('nc-root').style.display = 'none'
+          document.getElementById('cms-unavailable').style.display = 'block'
+          return
+        }
+
+        // Netlify Identity is harmless locally, where `local_backend: true`
+        // in config.yml takes over instead.
+        ;['https://identity.netlify.com/v1/netlify-identity-widget.js', '/admin/decap-cms.js'].forEach(
+          function (src) {
+            var script = document.createElement('script')
+            script.src = src
+            script.async = false
+            document.body.appendChild(script)
+          },
+        )
       })()
-    </script>
-
-    <!--
-      Netlify Identity handles editor login in production. Harmless locally,
-      where `local_backend: true` in config.yml takes over instead.
-    -->
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-
-    <!--
-      Decap CMS is served from our own origin rather than a CDN: the bundle is
-      fetched into public/admin/ by scripts/fetch-cms.mjs during `npm run build`,
-      so /admin keeps working even if unpkg is down.
-    -->
-    <script src="/admin/decap-cms.js"></script>
-
-    <script>
-      // Send a first-time Netlify Identity signup straight into the editor.
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on('init', (user) => {
-          if (!user) {
-            window.netlifyIdentity.on('login', () => {
-              document.location.href = '/admin/'
-            })
-          }
-        })
-      }
     </script>
   </body>
 </html>

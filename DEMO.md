@@ -61,8 +61,20 @@ Switch to the `/admin` tab.
 - Go back to `/admin`, move the post to **Ready**, and publish.
 - Switch to the site tab, reload. **The post is live.**
 
-> "That's the whole handoff. No developer, no deploy request, no ticket. In production this is
-> Netlify Identity — an editor signs in with their email and never sees GitHub."
+> "That's the whole handoff. No developer, no deploy request, no ticket."
+
+**Expect "why doesn't this work on the live site?"** — open the deployed `/admin`, which says so
+itself. Don't be apologetic about it; it's a licensing constraint you handled deliberately:
+
+> "Decap's git-gateway backend authenticates through Netlify Identity, which Netlify no longer
+> gives you on the free tier. So rather than boot an editor that can only produce a login error, the
+> deployed page explains the constraint and points at the local workflow — and it skips loading a
+> 5 MB bundle onto a page that can't use it.
+>
+> The two real options are Identity on a paid plan, which is zero code, or the GitHub OAuth
+> backend, which is free but needs an auth service and gives every editor a GitHub account. For a
+> marketing team I'd pay for Identity — 'sign in with your work email' is the entire point, and
+> making non-developers hold GitHub accounts defeats it."
 
 Then show what just happened on disk: a new `.md` file appeared in `src/content/blog/`.
 
@@ -238,8 +250,8 @@ right and my other tests were the unreliable ones.
 
 - **`/admin` shows "Loading the content editor…"** — the local backend isn't running.
   `npm run cms` in another terminal, then reload.
-- **The live `/admin` won't sign you in** — Netlify Identity or Git Gateway isn't enabled. Don't
-  debug it on the call; switch to the localhost tab, where the CMS needs no accounts at all.
+- **The live `/admin` shows an explanation instead of an editor** — that is intentional, not a
+  failure. Netlify Identity is paywalled; the page says so. Demo the CMS on localhost.
 - **A test fails** — good. Read the error out loud and talk through what it's telling you. Reading
   a failure calmly reads better than a green run.
 - **The dev server is stale** — `npm run build && npm run preview` serves the real production
