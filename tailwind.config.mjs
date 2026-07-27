@@ -1,6 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./src/**/*.{astro,html,js,jsx,md,mdx,ts,tsx}'],
+  content: [
+    './src/**/*.{astro,html,js,jsx,md,mdx,ts,tsx}',
+    // Preline ships its interactive markup classes from here.
+    './node_modules/preline/dist/*.js',
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -32,16 +36,20 @@ export default {
       },
     },
   },
-  plugins: [require('daisyui')],
+  // daisyUI supplies the theme tokens and base components; Preline supplies the
+  // `hs-*` variants that drive its accessible overlay/dropdown behaviour.
+  plugins: [require('daisyui'), require('preline/plugin')],
   daisyui: {
     themes: [
       {
         blog: {
-          primary: '#0D9488',
+          // Teal-700 rather than teal-600: white button text needs a 4.5:1
+          // contrast ratio at 14px, and #0D9488 only reached 3.74:1.
+          primary: '#0F766E',
           'primary-content': '#ffffff',
-          secondary: '#F97362',
+          secondary: '#C2410C',
           'secondary-content': '#ffffff',
-          accent: '#DA9A2E',
+          accent: '#A16207',
           'accent-content': '#ffffff',
           neutral: '#201B16',
           'neutral-content': '#F6F1E9',

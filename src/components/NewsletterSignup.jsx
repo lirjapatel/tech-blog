@@ -65,7 +65,7 @@ export default function NewsletterSignup() {
           Please enter a valid email address.
         </p>
       )}
-      <p className="mt-3 text-xs text-base-content/55">
+      <p className="mt-3 text-xs text-base-content/70">
         Roughly monthly. Unsubscribe anytime.
       </p>
     </form>

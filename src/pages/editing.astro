@@ -1,0 +1,341 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { SITE } from '../consts'
+
+/**
+ * The editor-facing documentation, published as a page rather than buried in a
+ * README. Anyone who has to update this site can be sent a link.
+ */
+
+const steps = [
+  {
+    title: 'Sign in to the editor',
+    body: 'Go to /admin and sign in with your email. You will never see GitHub, a terminal, or any code — just a list of the posts already on the site.',
+    detail: 'Access is invite-only. Ask a developer to send you an invitation from Netlify Identity.',
+  },
+  {
+    title: 'Write the post',
+    body: 'Click "New Blog post" and fill in the form. The Body field is a rich text editor: headings, bold, links, lists, images, and code blocks all work the way you would expect.',
+    detail: 'Use "Heading 2" for section titles — the table of contents on the article page builds itself from those.',
+  },
+  {
+    title: 'Save as a draft',
+    body: 'Hit Save. Nothing is live yet. The post moves into a Drafts column where you can leave it, come back to it, or send it for review.',
+    detail: 'Drafts live in the same place as published posts, so nothing gets lost in someone’s inbox.',
+  },
+  {
+    title: 'Publish',
+    body: 'Drag the post to "Ready" and press Publish. That is the whole handoff — no developer, no deploy request, no ticket.',
+    detail: 'The site rebuilds automatically and the post appears live, usually within two minutes.',
+  },
+]
+
+const fields = [
+  {
+    name: 'Title',
+    what: 'The headline of the post.',
+    where: 'Page heading, browser tab, search results, and the social preview card.',
+    tip: 'Under 70 characters reads best in Google results.',
+  },
+  {
+    name: 'Excerpt',
+    what: 'A one- or two-sentence summary.',
+    where: 'Post cards, the RSS feed, and the description Google shows under your link.',
+    tip: 'Write it as a hook, not a repeat of the title.',
+  },
+  {
+    name: 'Published date',
+    what: 'The date shown on the article.',
+    where: 'Controls the order posts appear in — newest first.',
+    tip: 'Set a future date and the post simply sorts to the top when published.',
+  },
+  {
+    name: 'Tags',
+    what: 'Topic labels.',
+    where: 'Each tag gets its own page at /tags/…, and the first tag chooses the cover colour.',
+    tip: 'Reuse existing tags where you can — a tag used once creates a page with one post on it.',
+  },
+  {
+    name: 'Feature on the homepage',
+    what: 'Pins the post to the big card at the top of the homepage.',
+    where: 'The homepage hero.',
+    tip: 'Only the newest featured post is used, so you can leave old ones switched on.',
+  },
+  {
+    name: 'Cover image',
+    what: 'An optional header image.',
+    where: 'The top of the article and the post card.',
+    tip: 'Leave it empty and a gradient cover is generated from the first tag. That is the default look.',
+  },
+  {
+    name: 'Draft',
+    what: 'Hides the post from the live site.',
+    where: 'Nowhere public — drafts never reach visitors.',
+    tip: 'Useful for parking a half-written idea without it going out.',
+  },
+]
+
+const faqs = [
+  {
+    q: 'Can I break the website?',
+    a: 'Practically, no. Every post is checked against a set of rules when the site rebuilds — a missing title or a malformed date stops that build and the currently live site stays exactly as it was. Visitors never see a broken page. A developer gets a clear error saying which post and which field.',
+  },
+  {
+    q: 'How long until my post is live?',
+    a: 'Usually under two minutes. Publishing triggers a rebuild of the whole site, which takes about six seconds, plus a little time to distribute it worldwide. If you do not see it after five minutes, hard-refresh the page first — your browser may be showing you a cached copy.',
+  },
+  {
+    q: 'How do I fix a typo in a published post?',
+    a: 'Open the post in /admin, fix it, and press Publish again. The same rebuild runs and the corrected version replaces the old one. There is no separate "update" flow to learn.',
+  },
+  {
+    q: 'Can I undo something?',
+    a: 'Yes. Every save is recorded with who made it and when, so any version can be restored. Ask a developer and they can roll a post back to any earlier state — nothing is ever really deleted.',
+  },
+  {
+    q: 'What happens if I add a brand-new tag?',
+    a: 'A page for it is created automatically at /tags/your-tag, it appears in the topic list on the homepage, and it gets its own cover colour. No developer involvement needed.',
+  },
+  {
+    q: 'Do I need to resize images before uploading?',
+    a: 'Cover images look best at roughly 1600 pixels wide. Anything much larger just makes the page slower to load without looking better.',
+  },
+]
+---
+
+<BaseLayout
+  title={`Editor's guide — ${SITE.author}`}
+  description="How to publish and update articles on this site without touching any code."
+  breadcrumbs={[
+    { name: 'Home', href: '/' },
+    { name: "Editor's guide", href: '/editing' },
+  ]}
+>
+  <section class="section-pad pt-20 md:pt-24" aria-labelledby="guide-heading">
+    <div class="shell">
+      <div class="max-w-3xl">
+        <p class="eyebrow">For content editors</p>
+        <h1 id="guide-heading" class="mt-2 font-display text-5xl tracking-tight md:text-6xl">
+          Publishing without touching code
+        </h1>
+        <p class="mt-6 text-lg leading-relaxed text-base-content/70">
+          This site is built by developers but written by editors. Content lives in a headless CMS,
+          completely separate from the code — which means publishing an article never requires a
+          developer, a deploy, or a ticket.
+        </p>
+        <p class="mt-4 text-base leading-relaxed text-base-content/75">
+          This page is the whole workflow, written for someone who has never opened a code editor.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a class="btn btn-primary" href="/admin/">Open the editor</a>
+          <a class="btn btn-ghost" href="#pipeline">What happens when I publish?</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Steps -->
+  <section class="section-pad pt-6" aria-labelledby="steps-heading">
+    <div class="shell">
+      <h2 id="steps-heading" class="font-display text-3xl">Publishing a post, start to finish</h2>
+      <ol class="mt-10 grid gap-6 md:grid-cols-2">
+        {
+          steps.map((step, index) => (
+            <li class="reveal surface-card p-7" style={`transition-delay:${(index % 2) * 80}ms`}>
+              <span
+                class="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 font-display text-lg font-semibold text-primary"
+                aria-hidden="true"
+              >
+                {index + 1}
+              </span>
+              <h3 class="mt-4 font-display text-xl">{step.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-base-content/70">{step.body}</p>
+              <p class="mt-3 border-l-2 border-primary/30 pl-3 text-sm leading-relaxed text-base-content/70">
+                {step.detail}
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Pipeline -->
+  <section class="section-pad pt-6" id="pipeline" aria-labelledby="pipeline-heading">
+    <div class="shell reveal">
+      <div class="glass-panel p-8 md:p-10">
+        <p class="eyebrow">Behind the scenes</p>
+        <h2 id="pipeline-heading" class="mt-2 font-display text-3xl">What happens when you press Publish</h2>
+        <p class="mt-3 max-w-2xl text-base leading-relaxed text-base-content/70">
+          Nothing on this site is generated while a visitor waits. Pages are built once, in advance,
+          and served as finished files — which is why they load instantly.
+        </p>
+
+        <ol class="mt-8 grid gap-4 md:grid-cols-4">
+          {
+            [
+              { label: 'You press Publish', detail: 'in the editor at /admin' },
+              { label: 'The site rebuilds', detail: 'every page regenerated, ~6 seconds' },
+              { label: 'Checks run', detail: 'content validated, tests pass' },
+              { label: 'It goes live', detail: 'distributed worldwide, under 2 min' },
+            ].map((stage, index) => (
+              <li class="relative rounded-2xl border border-base-content/10 bg-base-100/60 p-5">
+                <span class="font-mono text-xs text-primary">0{index + 1}</span>
+                <p class="mt-2 font-semibold leading-snug">{stage.label}</p>
+                <p class="mt-1 text-sm text-base-content/70">{stage.detail}</p>
+              </li>
+            ))
+          }
+        </ol>
+
+        <p class="mt-8 border-t border-base-content/10 pt-6 text-sm leading-relaxed text-base-content/75">
+          <strong class="font-semibold text-base-content">The safety net:</strong> if a post is
+          missing something required, the rebuild stops and the live site is left untouched. A broken
+          draft can never take the site down — the worst case is that your change does not appear yet.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Field reference -->
+  <section class="section-pad pt-6" aria-labelledby="fields-heading">
+    <div class="shell">
+      <h2 id="fields-heading" class="font-display text-3xl">What each field does</h2>
+      <p class="mt-3 max-w-2xl text-base text-base-content/70">
+        Every field in the editor, and exactly where it shows up on the site.
+      </p>
+
+      <!--
+        The wrapper scrolls horizontally on narrow screens, so it needs to be
+        focusable — otherwise keyboard users can never reach the columns that
+        are off-screen. `role="region"` plus a label makes it a named landmark
+        rather than an anonymous focus stop.
+      -->
+      <div
+        class="reveal mt-8 overflow-x-auto rounded-2xl border border-base-content/10"
+        tabindex="0"
+        role="region"
+        aria-label="Editor field reference, scrollable"
+      >
+        <table class="w-full min-w-[46rem] border-collapse text-left text-sm">
+          <caption class="sr-only">
+            Reference of every editor field, what it is, where it appears, and a tip for using it
+          </caption>
+          <thead class="bg-base-200/60 text-xs uppercase tracking-wider text-base-content/70">
+            <tr>
+              <th scope="col" class="px-5 py-3 font-semibold">Field</th>
+              <th scope="col" class="px-5 py-3 font-semibold">What it is</th>
+              <th scope="col" class="px-5 py-3 font-semibold">Where it appears</th>
+              <th scope="col" class="px-5 py-3 font-semibold">Tip</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              fields.map((field) => (
+                <tr class="border-t border-base-content/10 align-top">
+                  <th scope="row" class="px-5 py-4 font-semibold text-base-content">
+                    {field.name}
+                  </th>
+                  <td class="px-5 py-4 text-base-content/70">{field.what}</td>
+                  <td class="px-5 py-4 text-base-content/70">{field.where}</td>
+                  <td class="px-5 py-4 text-base-content/70">{field.tip}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ: Preline accordion -->
+  <section class="section-pad pt-6" aria-labelledby="faq-heading">
+    <div class="shell">
+      <h2 id="faq-heading" class="font-display text-3xl">Common questions</h2>
+
+      <div class="hs-accordion-group reveal mt-8 max-w-3xl divide-y divide-base-content/10 rounded-2xl border border-base-content/10 bg-base-100/60">
+        {
+          faqs.map((faq, index) => (
+            <div class="hs-accordion" id={`faq-${index}`}>
+              <button
+                type="button"
+                class="hs-accordion-toggle group flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-display text-lg transition-colors hover:text-primary"
+                aria-controls={`faq-${index}-content`}
+                aria-expanded="false"
+              >
+                {faq.q}
+                <svg
+                  class="hs-accordion-active:rotate-180 h-5 w-5 shrink-0 text-base-content/70 transition-transform duration-200"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="m6 9 6 6 6-6"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+              <div
+                id={`faq-${index}-content`}
+                class="hs-accordion-content hidden w-full overflow-hidden transition-[height] duration-300"
+                role="region"
+                aria-labelledby={`faq-${index}`}
+              >
+                <p class="px-6 pb-5 text-base leading-relaxed text-base-content/70">{faq.a}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Developer note -->
+  <section class="section-pad pt-6" aria-labelledby="dev-heading">
+    <div class="shell reveal">
+      <div class="rounded-3xl border border-base-content/10 bg-gradient-to-br from-primary/8 via-base-100/40 to-secondary/8 p-8 md:p-10">
+        <p class="eyebrow">For developers</p>
+        <h2 id="dev-heading" class="mt-2 font-display text-3xl">How the content layer is wired</h2>
+        <p class="mt-4 max-w-3xl text-base leading-relaxed text-base-content/75">
+          Pages never talk to a CMS directly. They ask <code
+            class="rounded bg-base-content/10 px-1.5 py-0.5 font-mono text-sm">src/lib/posts.ts</code
+          > for content, and that module decides where it comes from: Contentful when API credentials are
+          present, Markdown in <code
+            class="rounded bg-base-content/10 px-1.5 py-0.5 font-mono text-sm">src/content/blog/</code
+          > otherwise. Both normalise to the same shape, so switching CMS is a config change rather than
+          a rewrite.
+        </p>
+        <p class="mt-4 max-w-3xl text-base leading-relaxed text-base-content/75">
+          The Markdown source is validated by a Zod schema at build time, and the CMS fields at
+          <code class="rounded bg-base-content/10 px-1.5 py-0.5 font-mono text-sm"
+            >public/admin/config.yml</code
+          > mirror that schema — so the editing UI and the type system describe the same content model.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a class="btn btn-outline btn-sm" href={SITE.social.github} target="_blank" rel="noreferrer">
+            Read the source
+          </a>
+          <a class="btn btn-outline btn-sm" href="/blog/contentful-content-workflow/">
+            Essay: modelling content well
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    /*
+     * Preline's accordion, imported per-page rather than site-wide.
+     *
+     * Preline's default entry point bundles every component and measured
+     * 297 KB — on every page, to power one FAQ list. Importing just the
+     * accordion module costs 6.5 KB and only on this page. The site-wide
+     * JavaScript budget is enforced by tests/content.spec.ts.
+     */
+    import 'preline/dist/accordion.mjs'
+  </script>
+</BaseLayout>

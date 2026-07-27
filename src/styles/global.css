@@ -51,6 +51,21 @@ h1, h2, h3, h4, h5 {
   background: hsl(var(--p) / 0.22);
 }
 
+/*
+ * A single, consistent focus ring for every interactive element. `:focus-visible`
+ * means it appears for keyboard users without adding a ring on mouse clicks.
+ */
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid hsl(var(--p));
+  outline-offset: 3px;
+  border-radius: 0.35rem;
+}
+
+/* `main` is focused by the skip link; it should not draw a ring of its own. */
+main:focus {
+  outline: none;
+}
+
 /* --------------------------------------------------------- components --- */
 @layer components {
   .section-pad {
@@ -62,7 +77,7 @@ h1, h2, h3, h4, h5 {
   }
 
   .eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.32em] text-primary/90;
+    @apply text-xs font-semibold uppercase tracking-[0.32em] text-primary;
   }
 
   .glass-panel {
@@ -94,12 +109,46 @@ h1, h2, h3, h4, h5 {
     @apply inline-flex items-center rounded-full border border-base-content/15 bg-base-200/60 px-3 py-1 text-xs font-medium text-base-content/75 transition-colors hover:border-primary/50 hover:text-primary;
   }
 
+  /* Square icon affordance used by the theme toggle, share links and menu button. */
+  .icon-button,
   .theme-toggle {
     @apply grid h-9 w-9 place-items-center rounded-full border border-base-content/15 text-base-content/70 transition-colors hover:border-primary/50 hover:text-primary;
   }
   .icon-sun { display: none; }
   [data-theme='blogdark'] .icon-sun { display: block; }
   [data-theme='blogdark'] .icon-moon { display: none; }
+
+  .nav-link {
+    @apply rounded-lg px-3 py-2 text-sm font-medium text-base-content/75 transition-colors hover:bg-base-content/5 hover:text-primary;
+  }
+  .nav-link[aria-current='page'] {
+    @apply bg-primary/10 text-primary;
+  }
+
+  /* --- Search ------------------------------------------------------------ */
+  .search-trigger {
+    @apply inline-flex items-center gap-2 rounded-full border border-base-content/15 px-3 py-2 text-sm font-medium text-base-content/75 transition-colors hover:border-primary/50 hover:text-primary;
+  }
+
+  .search-kbd {
+    @apply items-center rounded border border-base-content/20 bg-base-content/5 px-1.5 py-0.5 font-mono text-[0.65rem] leading-none text-base-content/70;
+  }
+
+  .search-esc {
+    @apply shrink-0 rounded-md border border-base-content/20 px-2 py-1 font-mono text-[0.7rem] text-base-content/70 transition-colors hover:border-primary/50 hover:text-primary;
+  }
+
+  .search-panel {
+    @apply overflow-hidden rounded-2xl border border-base-content/10 bg-base-100 shadow-2xl;
+  }
+
+  /* Skip link — visually hidden until it receives keyboard focus. */
+  .skip-link {
+    @apply fixed left-4 top-4 z-[100] -translate-y-24 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-content shadow-lg transition-transform;
+  }
+  .skip-link:focus {
+    @apply translate-y-0;
+  }
 
   /* Reading progress bar */
   .reading-progress {
@@ -127,6 +176,16 @@ h1, h2, h3, h4, h5 {
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
   html { scroll-behavior: auto; }
+  /*
+   * `animate-fade-up` uses `animation-fill-mode: both`, so it starts at
+   * opacity 0. Cancelling the animation without this would leave the element
+   * invisible — it must be reset to its final state, not merely stopped.
+   */
+  .animate-fade-up {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
   .gradient-text, .animate-float, .animate-gradient-pan { animation: none !important; }
 }
 
@@ -182,6 +241,104 @@ h1, h2, h3, h4, h5 {
 }
 .article-content img {
   @apply my-8 w-full rounded-2xl border border-base-content/10;
+}
+
+/* --------------------------------------------------------- search dialog --- */
+/*
+ * Native <dialog> gives us focus trapping, Escape-to-close and an inert
+ * background for free. We only need to place and animate it.
+ */
+.search-dialog {
+  width: min(38rem, calc(100vw - 2rem));
+  max-height: 80vh;
+  margin: 0 auto;
+  margin-top: 12vh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+}
+.search-dialog::backdrop {
+  background: hsl(0 0% 0% / 0.45);
+  backdrop-filter: blur(4px);
+}
+.search-dialog[open] {
+  animation: dialog-in 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.985);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .search-dialog[open] {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------- nav drawer --- */
+/*
+ * Right-anchored sheet. Native <dialog> centres itself by default, so the
+ * margins pin it to the full height of the right edge instead.
+ */
+.nav-drawer {
+  width: 18rem;
+  max-width: 85vw;
+  height: 100%;
+  max-height: 100%;
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid hsl(var(--bc) / 0.1);
+  background: hsl(var(--b1));
+  color: hsl(var(--bc));
+}
+.nav-drawer::backdrop {
+  background: hsl(0 0% 0% / 0.5);
+}
+.nav-drawer[open] {
+  animation: drawer-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-drawer[open] {
+    animation: none;
+  }
+}
+
+/* --------------------------------------------------- article extras --- */
+/*
+ * Astro's Markdown pipeline adds an `id` to every heading; this turns that into
+ * a hoverable anchor link without cluttering the reading experience.
+ */
+.article-content h2,
+.article-content h3 {
+  position: relative;
+}
+.article-content h2 > a.heading-anchor,
+.article-content h3 > a.heading-anchor {
+  position: absolute;
+  left: -1.15em;
+  opacity: 0;
+  color: hsl(var(--p));
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+.article-content h2:hover > a.heading-anchor,
+.article-content h3:hover > a.heading-anchor,
+.article-content a.heading-anchor:focus-visible {
+  opacity: 1;
+}
+
+/* Table of contents */
+.toc a[aria-current='true'] {
+  @apply font-semibold text-primary;
+  border-color: hsl(var(--p));
 }
 
 /* Post cover art — deterministic gradient blocks */

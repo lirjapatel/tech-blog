@@ -1,10 +1,21 @@
 {
   "name": "tech-blog",
   "version": "1.0.0",
+  "private": true,
+  "type": "module",
   "scripts": {
+    "predev": "node scripts/fetch-cms.mjs",
     "dev": "astro dev",
+    "prebuild": "node scripts/fetch-cms.mjs",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "check": "astro check",
+    "cms": "decap-server",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:a11y": "playwright test tests/a11y.spec.ts",
+    "test:report": "playwright show-report",
+    "verify": "npm run check && npm run build && npm run test"
   },
   "dependencies": {
     "@astrojs/react": "^3.3.4",
@@ -13,11 +24,20 @@
     "astro": "^4.8.7",
     "contentful": "^10.8.2",
     "daisyui": "^4.10.1",
+    "preline": "^2.7.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwindcss": "^3.4.3"
   },
   "devDependencies": {
-    "@types/react": "^18.3.3"
+    "@astrojs/check": "^0.7.0",
+    "@axe-core/playwright": "^4.12.1",
+    "@fontsource/inter": "^5.3.0",
+    "@playwright/test": "^1.62.0",
+    "@types/react": "^18.3.3",
+    "decap-server": "^3.10.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "satori": "^0.12.2",
+    "typescript": "^5.9.3"
   }
 }

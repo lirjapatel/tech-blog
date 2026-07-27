@@ -1,0 +1,76 @@
+---
+import type { PostHeading } from '../types'
+
+interface Props {
+  headings: PostHeading[]
+}
+
+const { headings } = Astro.props
+---
+
+{
+  headings.length > 1 && (
+    <nav class="toc" aria-labelledby="toc-heading">
+      <h2 id="toc-heading" class="text-xs font-semibold uppercase tracking-[0.2em] text-base-content/70">
+        On this page
+      </h2>
+      <ul class="mt-4 space-y-1 border-l border-base-content/10 text-sm">
+        {headings.map((heading) => (
+          <li>
+            <a
+              href={`#${heading.slug}`}
+              class:list={[
+                'block border-l-2 border-transparent py-1.5 pr-2 text-base-content/70 transition-colors hover:text-primary',
+                heading.depth === 3 ? 'pl-7' : 'pl-4',
+              ]}
+              data-toc-link
+            >
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<script>
+  /**
+   * Highlights the section currently in view. Uses IntersectionObserver against
+   * the headings themselves rather than scroll math, so it stays cheap and does
+   * not run work on every scroll frame.
+   */
+  const links = Array.from(
+    document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'),
+  )
+
+  if (links.length > 0 && 'IntersectionObserver' in window) {
+    const byId = new Map(links.map((link) => [decodeURIComponent(link.hash.slice(1)), link]))
+    const headings = [...byId.keys()]
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null)
+
+    const setActive = (id: string) => {
+      for (const [key, link] of byId) {
+        if (key === id) link.setAttribute('aria-current', 'true')
+        else link.removeAttribute('aria-current')
+      }
+    }
+
+    const visible = new Set<string>()
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visible.add(entry.target.id)
+          else visible.delete(entry.target.id)
+        }
+        // Pick the first visible heading in document order.
+        const current = headings.find((heading) => visible.has(heading.id))
+        if (current) setActive(current.id)
+      },
+      { rootMargin: '-96px 0px -70% 0px' },
+    )
+
+    headings.forEach((heading) => observer.observe(heading))
+  }
+</script>

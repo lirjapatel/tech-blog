@@ -1,22 +1,47 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
+import { getAllPosts } from '../lib/posts'
+import { SITE } from '../consts'
+
+const recent = (await getAllPosts()).slice(0, 3)
 ---
 
 <BaseLayout
-  title="Page not found | Lirja Tech Blog"
+  title={`Page not found — ${SITE.author}`}
   description="The page you were looking for could not be found."
 >
-  <section class="section-pad pt-24">
+  <section class="section-pad pt-24" aria-labelledby="notfound-heading">
     <div class="glass-panel mx-auto max-w-xl rounded-3xl p-10 text-center">
-      <p class="text-xs uppercase tracking-[0.4em] text-primary/80">Error 404</p>
-      <h1 class="mt-4 text-4xl font-semibold md:text-5xl">Lost in the archives</h1>
+      <p class="text-xs uppercase tracking-[0.4em] text-primary">Error 404</p>
+      <h1 id="notfound-heading" class="mt-4 text-4xl font-semibold md:text-5xl">
+        Lost in the archives
+      </h1>
       <p class="mt-4 text-base text-base-content/75">
-        The page you were looking for doesn't exist or may have moved.
+        The page you were looking for doesn&apos;t exist or may have moved.
       </p>
       <div class="mt-8 flex flex-wrap justify-center gap-3">
         <a class="btn btn-primary" href="/">Back to home</a>
-        <a class="btn btn-outline" href="/#posts">Browse posts</a>
+        <a class="btn btn-outline" href="/blog">Browse all writing</a>
       </div>
+
+      {
+        recent.length > 0 && (
+          <div class="mt-10 border-t border-base-content/10 pt-6 text-left">
+            <h2 class="text-xs font-semibold uppercase tracking-wider text-base-content/70">
+              Recent essays
+            </h2>
+            <ul class="mt-3 space-y-2 text-sm">
+              {recent.map((post) => (
+                <li>
+                  <a class="link-underline" href={`/blog/${post.slug}/`}>
+                    {post.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
     </div>
   </section>
 </BaseLayout>

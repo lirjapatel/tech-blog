@@ -1,0 +1,118 @@
+# Decap CMS configuration.
+#
+# This describes the editing UI at /admin. The fields below mirror the Zod
+# schema in src/content/config.ts exactly — if you add a field here, add it
+# there too, or the build will reject the content.
+
+# Production: Netlify Identity + Git Gateway. Editors log in with email and
+# never see GitHub; Decap commits on their behalf.
+backend:
+  name: git-gateway
+  branch: main
+  commit_messages:
+    create: 'content: add "{{slug}}"'
+    update: 'content: update "{{slug}}"'
+    delete: 'content: remove "{{slug}}"'
+    uploadMedia: 'content: upload {{path}}'
+    deleteMedia: 'content: remove {{path}}'
+
+# Local demo: with `npm run cms` running, the CMS reads and writes the real
+# Markdown files in this repo — no GitHub account, no network required.
+local_backend: true
+
+# Editorial workflow puts new posts through Draft -> In review -> Ready
+# instead of publishing straight to the live site.
+publish_mode: editorial_workflow
+
+media_folder: public/uploads
+public_folder: /uploads
+
+site_url: https://lirja-tech-blog.netlify.app
+logo_url: https://lirja-tech-blog.netlify.app/favicon.svg
+
+collections:
+  - name: blog
+    label: Blog posts
+    label_singular: Blog post
+    description: >-
+      Essays published at /blog. The file name becomes the URL, so
+      "Astro islands" is published at /blog/astro-islands.
+    folder: src/content/blog
+    create: true
+    delete: true
+    slug: '{{title}}'
+    extension: md
+    format: frontmatter
+    sortable_fields: [publishedDate, title]
+    view_filters:
+      - label: Drafts only
+        field: draft
+        pattern: true
+      - label: Featured
+        field: featured
+        pattern: true
+    editor:
+      preview: false
+    fields:
+      - label: Title
+        name: title
+        widget: string
+        hint: Shown as the page heading and in search results. Aim for under 70 characters.
+        pattern: ['^.{1,120}$', 'Keep the title under 120 characters.']
+
+      - label: Excerpt
+        name: excerpt
+        widget: text
+        hint: >-
+          One or two sentences. Used on cards, in the RSS feed, and as the
+          Google search description.
+        pattern: ['^.{1,300}$', 'Keep the excerpt under 300 characters.']
+
+      - label: Published date
+        name: publishedDate
+        widget: datetime
+        date_format: YYYY-MM-DD
+        time_format: false
+        format: YYYY-MM-DD
+        picker_utc: true
+        hint: Controls ordering. Posts appear newest first.
+
+      - label: Tags
+        name: tags
+        widget: list
+        default: []
+        required: false
+        hint: >-
+          Each tag gets its own page at /tags/<tag>. The first tag also picks
+          the cover art colour. Reuse existing tags where you can.
+
+      - label: Feature on the homepage
+        name: featured
+        widget: boolean
+        default: false
+        required: false
+        hint: Pins this post to the large hero card. Only the newest featured post is used.
+
+      - label: Reading time
+        name: readingTime
+        widget: string
+        required: false
+        hint: Optional override, e.g. "6 min read". Leave blank to calculate it automatically.
+
+      - label: Cover image
+        name: cover
+        widget: image
+        required: false
+        hint: Optional. Without one, a gradient cover is generated from the first tag.
+
+      - label: Draft
+        name: draft
+        widget: boolean
+        default: false
+        required: false
+        hint: Drafts are visible while previewing locally but are never published to the live site.
+
+      - label: Body
+        name: body
+        widget: markdown
+        hint: The article itself. Use "Heading 2" for section titles so the table of contents builds correctly.

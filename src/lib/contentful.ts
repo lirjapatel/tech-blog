@@ -1,7 +1,7 @@
 import { documentToHtmlString } from '@contentful/rich-text-html-renderer'
 import contentful from 'contentful'
-import { mockPosts } from '../data/mockPosts'
 import type { BlogPost } from '../types'
+import { estimateReadingTime } from './reading-time'
 
 const { createClient } = contentful
 
@@ -9,78 +9,63 @@ const space = import.meta.env.CONTENTFUL_SPACE_ID
 const accessToken = import.meta.env.CONTENTFUL_ACCESS_TOKEN
 const environment = import.meta.env.CONTENTFUL_ENVIRONMENT || 'master'
 
-const client = space && accessToken
-  ? createClient({
-      space,
-      accessToken,
-      environment,
-    })
-  : null
+/**
+ * Only created when both credentials are present. A missing token is a
+ * supported state, not an error — `getPosts()` returns null and the caller
+ * falls back to Markdown. See `src/lib/posts.ts`.
+ */
+const client =
+  space && accessToken ? createClient({ space, accessToken, environment }) : null
 
-const estimateReadingTime = (html: string) => {
-  const words = html
-    .replace(/<[^>]*>/g, ' ')
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-  const minutes = Math.max(1, Math.round(words.length / 220))
-  return `${minutes} min read`
-}
+export const isConfigured = client !== null
 
 const mapEntry = (entry: any): BlogPost => {
-  const fields = entry.fields || {}
+  const fields = entry.fields ?? {}
   const body = fields.body
     ? documentToHtmlString(fields.body)
-    : `<p>${fields.excerpt || ''}</p>`
-  const slug = fields.slug || fields.title?.toLowerCase().replace(/\s+/g, '-')
+    : `<p>${fields.excerpt ?? ''}</p>`
+  const slug: string =
+    fields.slug || String(fields.title ?? 'untitled').toLowerCase().replace(/\s+/g, '-')
   const coverUrl = fields.coverImage?.fields?.file?.url
-  const publishedAt = fields.publishedDate || new Date().toISOString()
 
   return {
-    id: entry.sys?.id || slug,
-    title: fields.title || 'Untitled',
+    id: entry.sys?.id ?? slug,
+    title: fields.title ?? 'Untitled',
     slug,
-    excerpt: fields.excerpt || '',
+    excerpt: fields.excerpt ?? '',
     body,
-    tags: fields.tags || [],
-    publishedAt,
-    readingTime: fields.readingTime || estimateReadingTime(body),
+    tags: fields.tags ?? [],
+    publishedAt: fields.publishedDate ?? entry.sys?.createdAt ?? new Date().toISOString(),
+    readingTime: fields.readingTime || estimateReadingTime(body.replace(/<[^>]*>/g, ' ')),
     cover: coverUrl ? `https:${coverUrl}` : null,
+    featured: Boolean(fields.featured),
+    draft: false,
+    source: 'contentful',
   }
 }
 
-export const getAllPosts = async (): Promise<BlogPost[]> => {
-  if (!client) {
-    return mockPosts
-  }
+/**
+ * Fetches every published `blogPost` entry.
+ *
+ * Returns `null` — rather than throwing or returning `[]` — when Contentful is
+ * unconfigured or unreachable, so the caller can tell "no CMS" apart from
+ * "CMS with no posts" and fall back deliberately.
+ */
+export const getPosts = async (): Promise<BlogPost[] | null> => {
+  if (!client) return null
 
   try {
     const entries = await client.getEntries({
       content_type: 'blogPost',
-      order: '-fields.publishedDate',
+      order: ['-fields.publishedDate'] as any,
+      limit: 200,
     })
-
     return entries.items.map(mapEntry)
   } catch (error) {
-    return mockPosts
-  }
-}
-
-export const getPostBySlug = async (slug: string): Promise<BlogPost | null> => {
-  if (!client) {
-    return mockPosts.find((post) => post.slug === slug) || null
-  }
-
-  try {
-    const entries = await client.getEntries({
-      content_type: 'blogPost',
-      'fields.slug': slug,
-      limit: 1,
-    })
-
-    const entry = entries.items[0]
-    return entry ? mapEntry(entry) : null
-  } catch (error) {
-    return mockPosts.find((post) => post.slug === slug) || null
+    console.warn(
+      '[contentful] Fetch failed, falling back to Markdown content:',
+      error instanceof Error ? error.message : error,
+    )
+    return null
   }
 }

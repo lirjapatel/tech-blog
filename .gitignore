@@ -3,3 +3,16 @@ dist
 .env
 .env.local
 .astro
+
+# Build artefacts
+*.log
+# Vendored by scripts/fetch-cms.mjs on predev/prebuild — not source.
+public/admin/decap-cms.js
+
+# Playwright
+test-results
+playwright-report
+blob-report
+
+# Personal documents kept alongside the project but not part of it
+*.docx

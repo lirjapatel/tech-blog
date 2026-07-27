@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Content editor — Lirja Patel</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, sans-serif;
+      }
+      #cms-loading {
+        display: grid;
+        place-items: center;
+        height: 100vh;
+        gap: 0.75rem;
+        color: #57534e;
+        text-align: center;
+        padding: 1.5rem;
+      }
+      #cms-loading strong {
+        font-size: 1.05rem;
+        color: #1c1917;
+      }
+      #cms-loading code {
+        background: #f5f5f4;
+        padding: 0.15rem 0.4rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Replaced by the CMS once it boots; stays visible if the bundle is missing. -->
+    <div id="cms-loading">
+      <strong>Loading the content editor…</strong>
+      <span>
+        If this message persists, run <code>npm run cms</code> in a second terminal, then reload.
+      </span>
+    </div>
+
+    <!--
+      Netlify Identity handles editor login in production. Harmless locally,
+      where `local_backend: true` in config.yml takes over instead.
+    -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+    <!--
+      Decap CMS is served from our own origin rather than a CDN: the bundle is
+      fetched into public/admin/ by scripts/fetch-cms.mjs during `npm run build`,
+      so /admin keeps working even if unpkg is down.
+    -->
+    <script src="/admin/decap-cms.js"></script>
+
+    <script>
+      // Send a first-time Netlify Identity signup straight into the editor.
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.on('init', (user) => {
+          if (!user) {
+            window.netlifyIdentity.on('login', () => {
+              document.location.href = '/admin/'
+            })
+          }
+        })
+      }
+    </script>
+  </body>
+</html>
