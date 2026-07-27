@@ -15,13 +15,19 @@ npm run dev        # terminal 2 — the site (:4321)
 
 Browser tabs, left to right:
 
-1. `http://localhost:4321` — the site
-2. `http://localhost:4321/admin/` — the CMS (log in is skipped locally)
-3. `http://localhost:4321/editing` — the editor's guide
-4. Your editor, with `src/lib/posts.ts` already open
+1. **The live site** — the deployed Netlify URL
+2. `http://localhost:4321` — the local copy, for anything you need to edit live
+3. `http://localhost:4321/admin/` — the CMS (log in is skipped locally)
+4. `http://localhost:4321/editing` — the editor's guide
+5. The GitHub repo
+6. Your editor, with `src/lib/posts.ts` already open
 
 Do a dry run of the publish step once beforehand. The only part that can surprise you is
 the CMS backend not running.
+
+**Open on the live URL, not localhost.** The posting asks for "a link to a real, live website" —
+lead with the thing they asked for. Drop to localhost only at the CMS step, where the local
+backend needs no accounts.
 
 ---
 
@@ -141,7 +147,32 @@ Then show `dist/og/` and open one PNG:
 
 ---
 
-## 6. AI in the workflow (60 seconds)
+## 6. Deployment and the form (90 seconds)
+
+Live site tab. Scroll to the newsletter form and subscribe with a real address, then show the
+submission landing in **Netlify → Forms**.
+
+> "There's no backend here and no API key in the browser. Netlify registers forms by scanning the
+> built HTML — but this signup is a React island that renders in the browser, so the build step
+> never sees it. The fix is a hidden static form in the page with matching field names; the island
+> posts to that. It's a five-line trick that took reading the docs properly to find."
+
+The judgment point, which is the part worth saying:
+
+> "The form reports three outcomes separately — success, a server error, and the 404 you get on a
+> local preview where Netlify's handler doesn't exist. The easy version shows success no matter
+> what. I'd rather a visitor know their subscription failed than believe it worked."
+
+Then, if there's interest in the deploy itself:
+
+> "Canonical tags, RSS, the sitemap and the social cards all need the real domain — which Netlify
+> only assigns after the first deploy. So it isn't hardcoded: the config reads Netlify's `URL`, and
+> falls back to `DEPLOY_PRIME_URL` on preview builds. That means a pull-request preview points at
+> itself instead of telling Google it's production."
+
+---
+
+## 7. AI in the workflow (60 seconds)
 
 They will ask. `/about` has a section on it; either open it or just answer.
 
@@ -177,13 +208,29 @@ before merge; visual regression snapshots, because the axe suite catches contras
 and pagination on the archive, which is fine at 7 posts and won't be at 70.
 
 **"What's the weakest part?"**
-The newsletter form is a stub — it validates and shows success without a provider behind it. I'd
-rather say that than have you find it. Wiring it up is an afternoon; I left it because the
-interesting part of this project was the content pipeline.
+Two, honestly. The archive has no pagination — fine at 7 posts, wrong at 70. And the content model
+only covers posts; a marketer who wanted a new landing page would still need me. I'd rather name
+those than have you find them.
 
 **"Did you write this or did the AI?"**
 Both, and I can show you which parts. Pick any file and I'll walk you through why it's built that
 way — that's the honest test of whether I understand it.
+
+**"Tell me about a bug you had to debug."**
+Have one ready. The best two from this project:
+
+*The type-checker running out of memory.* `astro check` would hang and then die with a heap
+overflow, on a six-post blog. The cause wasn't the site: `tsconfig.json` declared no `include`, so
+TypeScript walked the whole project root and tried to parse the 5 MB CMS vendor bundle sitting in
+`public/`. Scoping the program to authored source took it from a 45-second crash to 12 seconds.
+The lesson is that the error pointed at memory and the cause was configuration.
+
+*A test that passed for the wrong reason.* Three of my four newsletter tests passed; one failed
+claiming a valid email was invalid. The island hydrates with `client:visible`, so the field is
+interactive as plain HTML *before* React mounts — text typed into it is discarded when React
+asserts its own empty state. The three that passed were winning a race, not testing anything. The
+fix waits for Astro to drop the island's `ssr` marker. Worth telling because the failing test was
+right and my other tests were the unreliable ones.
 
 ---
 
@@ -191,6 +238,8 @@ way — that's the honest test of whether I understand it.
 
 - **`/admin` shows "Loading the content editor…"** — the local backend isn't running.
   `npm run cms` in another terminal, then reload.
+- **The live `/admin` won't sign you in** — Netlify Identity or Git Gateway isn't enabled. Don't
+  debug it on the call; switch to the localhost tab, where the CMS needs no accounts at all.
 - **A test fails** — good. Read the error out loud and talk through what it's telling you. Reading
   a failure calmly reads better than a green run.
 - **The dev server is stale** — `npm run build && npm run preview` serves the real production
