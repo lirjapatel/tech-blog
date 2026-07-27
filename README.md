@@ -211,6 +211,27 @@ scanner cannot perform. Notable fixes made during development:
 Netlify builds from `netlify.toml` (`npm run build` → publish `dist`). Push to `main` and it
 deploys.
 
+### First deploy
+
+```bash
+git remote add origin https://github.com/<user>/<repo>.git
+git push -u origin main
+```
+
+Then in Netlify: **Add new site → Import an existing project → GitHub**, pick the repo, and
+deploy. Build settings come from `netlify.toml`, so there is nothing to type in, and no
+environment variables are required — without Contentful credentials the site builds from the
+Markdown in `src/content/blog/`.
+
+Two things only work once deployed, because both are Netlify services rather than site code:
+
+- **The newsletter form.** Netlify registers it from the built HTML on first deploy; submissions
+  then appear under **Forms**. Locally the island reports that it is unavailable rather than
+  faking a success.
+- **`/admin` sign-in.** Enable **Site configuration → Identity**, then **Identity → Services →
+  Git Gateway**. Add editors with **Invite users**. Until Identity is on, the CMS loads but
+  cannot authenticate. For local editing, `npm run cms` needs no accounts at all.
+
 ### The site URL is not hardcoded
 
 Canonical tags, RSS links, the sitemap, and social-card metadata all need the domain being
