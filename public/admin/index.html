@@ -30,16 +30,44 @@
         border-radius: 4px;
         font-size: 0.85rem;
       }
+      /* Only one of these is ever shown; picked at runtime below. */
+      .cms-hint {
+        display: none;
+      }
     </style>
   </head>
   <body>
-    <!-- Replaced by the CMS once it boots; stays visible if the bundle is missing. -->
-    <div id="cms-loading">
-      <strong>Loading the content editor…</strong>
-      <span>
-        If this message persists, run <code>npm run cms</code> in a second terminal, then reload.
-      </span>
+    <!--
+      Decap renders into #nc-root, and React replaces whatever children this
+      element already has. Putting the loading state *inside* it means the CMS
+      clears it automatically on mount.
+
+      This previously sat outside #nc-root, so it was never removed — and since
+      it is 100vh, it covered the viewport and pushed the real editor below the
+      fold. The CMS looked like it was hanging when it had actually booted fine.
+    -->
+    <div id="nc-root">
+      <div id="cms-loading">
+        <strong>Loading the content editor…</strong>
+        <span class="cms-hint" data-hint="local">
+          If this message persists, run <code>npm run cms</code> in a second terminal, then reload.
+        </span>
+        <span class="cms-hint" data-hint="deployed">
+          If this message persists, the editor could not reach its login service.
+        </span>
+      </div>
     </div>
+
+    <script>
+      // The `npm run cms` hint is only true on a developer's machine. Telling a
+      // deployed visitor to run a terminal command is nonsense, so pick the
+      // hint that matches where this page is actually being served from.
+      ;(function () {
+        var isLocal = ['localhost', '127.0.0.1', '[::1]'].indexOf(window.location.hostname) !== -1
+        var hint = document.querySelector('[data-hint="' + (isLocal ? 'local' : 'deployed') + '"]')
+        if (hint) hint.style.display = 'block'
+      })()
+    </script>
 
     <!--
       Netlify Identity handles editor login in production. Harmless locally,
