@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+---
+
+<BaseLayout
+  title="Page not found | Lirja Tech Blog"
+  description="The page you were looking for could not be found."
+>
+  <section class="section-pad pt-24">
+    <div class="glass-panel mx-auto max-w-xl rounded-3xl p-10 text-center">
+      <p class="text-xs uppercase tracking-[0.4em] text-primary/80">Error 404</p>
+      <h1 class="mt-4 text-4xl font-semibold md:text-5xl">Lost in the archives</h1>
+      <p class="mt-4 text-base text-base-content/75">
+        The page you were looking for doesn't exist or may have moved.
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a class="btn btn-primary" href="/">Back to home</a>
+        <a class="btn btn-outline" href="/#posts">Browse posts</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

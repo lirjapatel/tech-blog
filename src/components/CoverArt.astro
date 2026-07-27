@@ -1,0 +1,87 @@
+---
+import type { BlogPost } from '../types'
+
+interface Props {
+  post: Pick<BlogPost, 'title' | 'tags'>
+  class?: string
+}
+
+const { post, class: className = '' } = Astro.props
+
+const palettes: Record<string, [string, string]> = {
+  AI: ['#6366F1', '#8B5CF6'],
+  React: ['#0EA5E9', '#22D3EE'],
+  Product: ['#FB7185', '#F59E0B'],
+  Security: ['#EF4444', '#F43F5E'],
+  'Data Viz': ['#14B8A6', '#22C55E'],
+  Astro: ['#8B5CF6', '#D946EF'],
+  Performance: ['#F59E0B', '#F97316'],
+  Frontend: ['#0D9488', '#06B6D4'],
+  Contentful: ['#2563EB', '#0EA5E9'],
+  CMS: ['#0EA5E9', '#6366F1'],
+  DX: ['#10B981', '#14B8A6'],
+  Deployment: ['#0D9488', '#10B981'],
+  Netlify: ['#14B8A6', '#22D3EE'],
+  DevOps: ['#64748B', '#0D9488'],
+  Architecture: ['#7C3AED', '#6366F1'],
+}
+
+const tag = post.tags?.[0] ?? 'Notes'
+
+const hueFrom = (str: string) => {
+  let h = 0
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % 360
+  return h
+}
+
+let from: string
+let to: string
+if (palettes[tag]) {
+  ;[from, to] = palettes[tag]
+} else {
+  const h = hueFrom(tag)
+  from = `hsl(${h} 70% 55%)`
+  to = `hsl(${(h + 42) % 360} 72% 48%)`
+}
+
+const style = `background-image: linear-gradient(125deg, ${from}, ${to});`
+---
+
+<div class={`cover-art ${className}`} style={style} aria-hidden="true">
+  <span class="cover-word">{tag}</span>
+  <svg class="cover-glow" viewBox="0 0 200 200" preserveAspectRatio="none">
+    <circle cx="30" cy="24" r="60" />
+  </svg>
+</div>
+
+<style>
+  .cover-art {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 1rem 1.25rem;
+  }
+  .cover-word {
+    position: relative;
+    z-index: 1;
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(1.75rem, 5vw, 3.25rem);
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.25);
+  }
+  .cover-glow {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.35;
+    mix-blend-mode: soft-light;
+  }
+  .cover-glow circle {
+    fill: #fff;
+    filter: blur(6px);
+  }
+</style>

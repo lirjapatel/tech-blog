@@ -1,0 +1,200 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------- base --- */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
+}
+
+body {
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Warm paper texture + soft aurora, theme-aware via daisyUI base tokens. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(60rem 40rem at 12% -8%, hsl(var(--p) / 0.14), transparent 55%),
+    radial-gradient(48rem 36rem at 92% 6%, hsl(var(--s) / 0.13), transparent 55%),
+    radial-gradient(50rem 40rem at 50% 110%, hsl(var(--a) / 0.1), transparent 55%);
+  pointer-events: none;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.4;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: hsl(var(--p) / 0.22);
+}
+
+/* --------------------------------------------------------- components --- */
+@layer components {
+  .section-pad {
+    @apply px-6 py-16 md:px-10 md:py-20 lg:px-16;
+  }
+
+  .shell {
+    @apply mx-auto w-full max-w-6xl;
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.32em] text-primary/90;
+  }
+
+  .glass-panel {
+    @apply rounded-3xl border border-base-content/10 bg-base-100/70 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.35)] backdrop-blur-md;
+  }
+
+  .surface-card {
+    @apply rounded-3xl border border-base-content/10 bg-base-100/80 backdrop-blur transition-all duration-300;
+  }
+
+  .surface-card:hover {
+    @apply -translate-y-1 border-primary/40 shadow-[0_28px_70px_-34px_rgba(0,0,0,0.5)];
+  }
+
+  .link-underline {
+    @apply relative inline-flex items-center gap-1 font-medium text-base-content/80 transition-colors hover:text-primary;
+  }
+
+  .gradient-text {
+    background: linear-gradient(120deg, hsl(var(--p)), hsl(var(--s)) 55%, hsl(var(--a)));
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradient-pan 12s ease infinite;
+  }
+
+  .chip {
+    @apply inline-flex items-center rounded-full border border-base-content/15 bg-base-200/60 px-3 py-1 text-xs font-medium text-base-content/75 transition-colors hover:border-primary/50 hover:text-primary;
+  }
+
+  .theme-toggle {
+    @apply grid h-9 w-9 place-items-center rounded-full border border-base-content/15 text-base-content/70 transition-colors hover:border-primary/50 hover:text-primary;
+  }
+  .icon-sun { display: none; }
+  [data-theme='blogdark'] .icon-sun { display: block; }
+  [data-theme='blogdark'] .icon-moon { display: none; }
+
+  /* Reading progress bar */
+  .reading-progress {
+    @apply fixed inset-x-0 top-0 z-50 h-1 bg-transparent;
+  }
+  .reading-progress > span {
+    @apply block h-full w-0 rounded-r-full;
+    background: linear-gradient(90deg, hsl(var(--p)), hsl(var(--s)));
+    transition: width 0.1s linear;
+  }
+}
+
+/* -------------------------------------------------- reveal-on-scroll --- */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  html { scroll-behavior: auto; }
+  .gradient-text, .animate-float, .animate-gradient-pan { animation: none !important; }
+}
+
+/* ------------------------------------------------------- article body --- */
+.article-content {
+  font-size: 1.075rem;
+  line-height: 1.8;
+  color: hsl(var(--bc) / 0.86);
+}
+.article-content > p:first-of-type {
+  font-size: 1.28rem;
+  line-height: 1.7;
+  color: hsl(var(--bc) / 0.92);
+}
+.article-content h2 {
+  @apply mt-12 mb-3 text-3xl;
+  scroll-margin-top: 6rem;
+}
+.article-content h3 {
+  @apply mt-8 mb-2 text-xl;
+}
+.article-content p { @apply my-5; }
+.article-content ul,
+.article-content ol { @apply my-5 space-y-2 pl-5; }
+.article-content ul { @apply list-disc; }
+.article-content ol { @apply list-decimal; }
+.article-content li { @apply pl-1; }
+.article-content li::marker { color: hsl(var(--p)); }
+.article-content a {
+  @apply font-medium text-primary underline decoration-primary/30 underline-offset-4 transition-colors hover:decoration-primary;
+}
+.article-content strong { @apply font-semibold text-base-content; }
+.article-content hr { @apply my-10 border-base-content/10; }
+
+.article-content blockquote {
+  @apply my-8 rounded-r-2xl border-l-4 border-secondary bg-secondary/5 py-4 pl-6 pr-5 text-lg italic;
+  color: hsl(var(--bc) / 0.82);
+}
+
+.article-content :not(pre) > code {
+  @apply rounded-md px-1.5 py-0.5 font-mono text-[0.85em];
+  background: hsl(var(--bc) / 0.08);
+  color: hsl(var(--p));
+}
+
+.article-content pre {
+  @apply my-7 overflow-x-auto rounded-2xl border border-base-content/10 p-5 font-mono text-sm leading-relaxed;
+  background: hsl(var(--n) / 0.96);
+  color: hsl(var(--nc));
+}
+.article-content pre code {
+  @apply bg-transparent p-0 text-inherit;
+}
+.article-content img {
+  @apply my-8 w-full rounded-2xl border border-base-content/10;
+}
+
+/* Post cover art — deterministic gradient blocks */
+.cover-art {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.cover-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(hsl(0 0% 100% / 0.16) 1px, transparent 1.4px);
+  background-size: 16px 16px;
+  mix-blend-mode: overlay;
+}

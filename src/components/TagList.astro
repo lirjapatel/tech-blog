@@ -1,0 +1,23 @@
+---
+interface Props {
+  tags?: string[]
+  linked?: boolean
+  class?: string
+}
+const { tags = [], linked = false, class: className = '' } = Astro.props
+const slugify = (t: string) => t.toLowerCase().replace(/\s+/g, '-')
+---
+
+<div class={`flex flex-wrap gap-2 ${className}`}>
+  {
+    tags.map((tag) =>
+      linked ? (
+        <a class="chip" href={`/tags/${slugify(tag)}`}>
+          {tag}
+        </a>
+      ) : (
+        <span class="chip">{tag}</span>
+      ),
+    )
+  }
+</div>

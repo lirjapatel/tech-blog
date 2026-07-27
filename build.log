@@ -1,0 +1,76 @@
+14:50:55 [types] Generated 102ms
+14:50:55 [build] output: "static"
+14:50:55 [build] directory: C:\Users\kaxit\Desktop\react project\New folder\tech-blog\dist\
+14:50:55 [build] Collecting build info...
+14:50:55 [build] ✓ Completed in 177ms.
+14:50:55 [build] Building static entrypoints...
+
+🌼   [35mdaisyUI[39m [2m4.12.24[22m
+├─ [32m✔︎[39m 2 themes added[2m		https://daisyui.com/docs/themes[22m
+╰─ [32m❤︎[39m [0mSupport daisyUI project:[0m	[2mhttps://opencollective.com/daisyui[22m
+
+
+🌼   [35mdaisyUI[39m [2m4.12.24[22m
+├─ [32m✔︎[39m 2 themes added[2m		https://daisyui.com/docs/themes[22m
+╰─ [32m★[39m [0mStar daisyUI on GitHub[0m	[2mhttps://github.com/saadeghi/daisyui[22m
+
+
+🌼   [35mdaisyUI[39m [2m4.12.24[22m
+├─ [32m✔︎[39m 2 themes added[2m		https://daisyui.com/docs/themes[22m
+╰─ [32m★[39m [0mStar daisyUI on GitHub[0m	[2mhttps://github.com/saadeghi/daisyui[22m
+
+14:50:58 [vite] [32m✓ built in 3.13s[39m
+14:50:58 [build] ✓ Completed in 3.16s.
+
+ building client (vite) 
+14:50:58 [vite] transforming...
+14:50:59 [vite] [32m✓[39m 30 modules transformed.
+14:50:59 [vite] rendering chunks...
+14:50:59 [vite] computing gzip size...
+14:50:59 [vite] [2mdist/[22m[36m_astro/NewsletterSignup.DAQfcN8W.js  [39m[1m[2m  2.59 kB[22m[1m[22m[2m │ gzip:  1.36 kB[22m
+14:50:59 [vite] [2mdist/[22m[36m_astro/index.CVf8TyFT.js             [39m[1m[2m  6.72 kB[22m[1m[22m[2m │ gzip:  2.68 kB[22m
+14:50:59 [vite] [2mdist/[22m[36m_astro/client.DrE9CFQR.js            [39m[1m[2m135.60 kB[22m[1m[22m[2m │ gzip: 43.80 kB[22m
+14:50:59 [vite] [32m✓ built in 1.04s[39m
+
+ generating static routes 
+14:50:59 ▶ src/pages/404.astro
+14:50:59   └─ /404.html (+11ms)
+14:50:59 ▶ src/pages/about.astro
+14:50:59   └─ /about/index.html (+5ms)
+14:50:59 ▶ src/pages/blog/[slug].astro
+14:50:59   ├─ /blog/ai-portfolio-assistant/index.html (+7ms)
+14:50:59   ├─ /blog/threat-dashboard-design/index.html (+4ms)
+14:50:59   ├─ /blog/astro-react-islands/index.html (+6ms)
+14:50:59   ├─ /blog/core-web-vitals-playbook/index.html (+5ms)
+14:50:59   ├─ /blog/contentful-content-workflow/index.html (+5ms)
+14:50:59   └─ /blog/static-site-deployment-playbook/index.html (+4ms)
+14:50:59 λ src/pages/robots.txt.ts
+14:50:59   └─ /robots.txt (+3ms)
+14:50:59 λ src/pages/rss.xml.ts
+14:50:59   └─ /rss.xml (+3ms)
+14:50:59 λ src/pages/sitemap.xml.ts
+14:50:59   └─ /sitemap.xml (+3ms)
+14:50:59 ▶ src/pages/tags/[tag].astro
+14:50:59   ├─ /tags/ai/index.html (+5ms)
+14:50:59   ├─ /tags/react/index.html (+4ms)
+14:50:59   ├─ /tags/product/index.html (+4ms)
+14:50:59   ├─ /tags/security/index.html (+4ms)
+14:50:59   ├─ /tags/data-viz/index.html (+3ms)
+14:50:59   ├─ /tags/astro/index.html (+4ms)
+14:50:59   ├─ /tags/performance/index.html (+5ms)
+14:50:59   ├─ /tags/architecture/index.html (+3ms)
+14:50:59   ├─ /tags/frontend/index.html (+3ms)
+14:50:59   ├─ /tags/contentful/index.html (+3ms)
+14:50:59   ├─ /tags/cms/index.html (+3ms)
+14:50:59   ├─ /tags/dx/index.html (+3ms)
+14:50:59   ├─ /tags/deployment/index.html (+6ms)
+14:50:59   ├─ /tags/netlify/index.html (+4ms)
+14:50:59   └─ /tags/devops/index.html (+3ms)
+14:50:59 ▶ src/pages/index.astro
+14:50:59   └─ /index.html (+22ms)
+14:50:59 ✓ Completed in 300ms.
+
+14:50:59 [build] 24 page(s) built in 4.73s
+14:50:59 [build] Complete!
+BUILD_EXIT=0
+---TAIL---

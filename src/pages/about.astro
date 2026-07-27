@@ -1,0 +1,119 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { getAllPosts } from '../lib/contentful'
+import { SITE } from '../consts'
+
+const posts = await getAllPosts()
+const topics = [...new Set(posts.flatMap((p) => p.tags))].sort()
+
+const focus = [
+  {
+    title: 'AI product experiences',
+    body: 'Grounded assistants and prompt design that stay honest, fast, and useful — not gimmicks.',
+  },
+  {
+    title: 'Interfaces under real data',
+    body: 'Dashboards and tables that stay smooth and legible when the demo data turns into a firehose.',
+  },
+  {
+    title: 'Fast static sites',
+    body: 'Astro islands and headless CMS workflows that ship near-zero JavaScript by default.',
+  },
+  {
+    title: 'Shipping to the cloud',
+    body: 'Reproducible builds, sensible caching, and deploy pipelines that stay boring on purpose.',
+  },
+]
+
+const stack = [
+  'React',
+  'Astro',
+  'TypeScript',
+  'Tailwind CSS',
+  'Node.js',
+  'Contentful',
+  'Netlify',
+  'Python',
+  'SQL',
+]
+---
+
+<BaseLayout title={`About — ${SITE.author}`} description={SITE.bio}>
+  <section class="section-pad pt-20 md:pt-28">
+    <div class="shell">
+      <div class="grid gap-12 lg:grid-cols-[1.1fr,0.9fr] lg:items-start">
+        <div class="animate-fade-up">
+          <span class="eyebrow">About</span>
+          <h1 class="mt-4 font-display text-5xl leading-[1.05] tracking-tight md:text-6xl">
+            Hi, I&apos;m {SITE.author}.
+          </h1>
+          <p class="mt-6 text-xl leading-relaxed text-base-content/75">{SITE.bio}</p>
+          <p class="mt-4 text-base leading-relaxed text-base-content/65">
+            I gravitate toward the seams of a product — the moment an API is slow, the table has
+            ten thousand rows, or the design needs to survive contact with real content. This blog
+            is where I write down what worked, what didn&apos;t, and why.
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a class="btn btn-primary" href={`mailto:${SITE.email}`}>Get in touch</a>
+            <a class="btn btn-ghost" href={SITE.social.github} target="_blank" rel="noreferrer">GitHub</a>
+            <a class="btn btn-ghost" href={SITE.social.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
+          </div>
+        </div>
+
+        <div class="glass-panel animate-fade-up p-8" style="animation-delay:120ms">
+          <p class="text-xs font-semibold uppercase tracking-wider text-base-content/50">
+            Tools I reach for
+          </p>
+          <div class="mt-4 flex flex-wrap gap-2">
+            {stack.map((s) => <span class="chip">{s}</span>)}
+          </div>
+          <p class="mt-8 text-xs font-semibold uppercase tracking-wider text-base-content/50">
+            I write about
+          </p>
+          <div class="mt-4 flex flex-wrap gap-2">
+            {
+              topics.map((t) => (
+                <a class="chip" href={`/tags/${t.toLowerCase().replace(/\s+/g, '-')}`}>
+                  {t}
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad pt-6">
+    <div class="shell">
+      <div class="grid gap-6 sm:grid-cols-2">
+        {
+          focus.map((f, i) => (
+            <div class="reveal surface-card p-7" style={`transition-delay:${(i % 2) * 80}ms`}>
+              <span class="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 font-display text-lg font-semibold text-primary">
+                {i + 1}
+              </span>
+              <h3 class="mt-4 font-display text-xl">{f.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-base-content/70">{f.body}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad pt-0">
+    <div class="shell reveal">
+      <div class="glass-panel flex flex-col items-start gap-4 p-8 md:flex-row md:items-center md:justify-between md:p-10">
+        <div>
+          <h2 class="font-display text-3xl">Want to work together?</h2>
+          <p class="mt-2 text-sm text-base-content/70">
+            I&apos;m open to frontend and product engineering work. The fastest way to reach me is
+            email.
+          </p>
+        </div>
+        <a class="btn btn-primary" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
