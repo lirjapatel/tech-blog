@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro'
 import { getAllPosts, getAllTags } from '../lib/posts'
-import { SITE } from '../consts'
 
 type Entry = { loc: string; lastmod: string; changefreq: string; priority: string }
 
@@ -9,25 +8,29 @@ type Entry = { loc: string; lastmod: string; changefreq: string; priority: strin
  * frequencies reflect what the pages actually are — articles matter more than
  * tag listings, and the homepage changes most often.
  */
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ site }) => {
   const posts = await getAllPosts()
   const tags = await getAllTags()
   const now = new Date().toISOString()
   const newestPost = posts[0] ? new Date(posts[0].publishedAt).toISOString() : now
 
+  // `site` comes from astro.config.mjs, which reads it from the deploy
+  // environment — so a preview deploy lists its own URLs, not production's.
+  const url = (path: string) => new URL(path, site).href
+
   const entries: Entry[] = [
-    { loc: `${SITE.url}/`, lastmod: newestPost, changefreq: 'weekly', priority: '1.0' },
-    { loc: `${SITE.url}/blog/`, lastmod: newestPost, changefreq: 'weekly', priority: '0.9' },
-    { loc: `${SITE.url}/about/`, lastmod: now, changefreq: 'monthly', priority: '0.6' },
-    { loc: `${SITE.url}/editing/`, lastmod: now, changefreq: 'monthly', priority: '0.3' },
+    { loc: url('/'), lastmod: newestPost, changefreq: 'weekly', priority: '1.0' },
+    { loc: url('/blog/'), lastmod: newestPost, changefreq: 'weekly', priority: '0.9' },
+    { loc: url('/about/'), lastmod: now, changefreq: 'monthly', priority: '0.6' },
+    { loc: url('/editing/'), lastmod: now, changefreq: 'monthly', priority: '0.3' },
     ...posts.map((post) => ({
-      loc: `${SITE.url}/blog/${post.slug}/`,
+      loc: url(`/blog/${post.slug}/`),
       lastmod: new Date(post.publishedAt).toISOString(),
       changefreq: 'monthly',
       priority: '0.8',
     })),
     ...tags.map((tag) => ({
-      loc: `${SITE.url}/tags/${tag.slug}/`,
+      loc: url(`/tags/${tag.slug}/`),
       lastmod: newestPost,
       changefreq: 'weekly',
       priority: '0.5',

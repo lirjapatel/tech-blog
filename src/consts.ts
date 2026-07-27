@@ -3,8 +3,6 @@ export const SITE = {
   tagline: 'Field notes on frontend, AI, and shipping fast, calm software.',
   description:
     'A frontend engineer writing about React, Astro, AI product design, performance, and cloud deployment — with the messy details left in.',
-  // Update this to your production URL (used for RSS, sitemap, and canonical tags).
-  url: 'https://lirja-tech-blog.netlify.app',
   author: 'Lirja Patel',
   role: 'Frontend Developer',
   email: 'patellirja@gmail.com',

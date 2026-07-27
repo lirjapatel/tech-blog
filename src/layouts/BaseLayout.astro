@@ -25,7 +25,8 @@ const {
   breadcrumbs = [],
 } = Astro.props
 
-const siteOrigin = (Astro.site ?? new URL(SITE.url)).origin
+// astro.config.mjs always sets `site`, resolved from the deploy environment.
+const siteOrigin = Astro.site!.origin
 const canonical = new URL(Astro.url.pathname, siteOrigin).href
 const socialImage = new URL(image, siteOrigin).href
 const year = new Date().getFullYear()

@@ -211,6 +211,21 @@ scanner cannot perform. Notable fixes made during development:
 Netlify builds from `netlify.toml` (`npm run build` → publish `dist`). Push to `main` and it
 deploys.
 
+### The site URL is not hardcoded
+
+Canonical tags, RSS links, the sitemap, and social-card metadata all need the domain being
+served, which Netlify only assigns after the first deploy. `astro.config.mjs` therefore reads it
+from the build environment:
+
+| Variable           | Set by Netlify for          | Used for                        |
+| ------------------ | --------------------------- | ------------------------------- |
+| `URL`              | the production deploy       | the real canonical domain       |
+| `DEPLOY_PRIME_URL` | branch and PR previews      | previews referencing themselves |
+| *(neither)*        | local `npm run build`       | `http://localhost:4321`         |
+
+Nothing to configure, and no step where a preview deploy tells search engines it is production.
+Pages read it through `Astro.site`; endpoints take it from the `site` property Astro passes them.
+
 ### Rebuild when content changes
 
 1. Netlify → **Build & deploy → Build hooks** → create a hook and copy the URL.

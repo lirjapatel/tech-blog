@@ -3,10 +3,22 @@ import react from '@astrojs/react'
 import tailwind from '@astrojs/tailwind'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 
+/**
+ * Absolute URLs (canonical tags, RSS, sitemap, social cards) have to match the
+ * domain actually being served, and Netlify only assigns that domain after the
+ * first deploy. Rather than hardcode a guess and ship wrong canonicals, take it
+ * from the build environment:
+ *
+ *   URL              production deploy of the site
+ *   DEPLOY_PRIME_URL branch deploys and pull-request previews
+ *
+ * Previews therefore reference themselves instead of pointing search engines at
+ * production. The literal is only the local-development fallback.
+ */
+const site = process.env.URL || process.env.DEPLOY_PRIME_URL || 'http://localhost:4321'
+
 export default defineConfig({
-  // Keep in sync with SITE.url in src/consts.ts — both build absolute URLs
-  // for canonical tags, RSS, the sitemap, and social card metadata.
-  site: 'https://lirja-tech-blog.netlify.app',
+  site,
   integrations: [react(), tailwind()],
   output: 'static',
   // Emit /blog/slug/index.html so URLs work on any static host.

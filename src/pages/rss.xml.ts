@@ -10,13 +10,17 @@ const escapeXml = (value: string) =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;')
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ site }) => {
   const posts = await getAllPosts()
   const buildDate = new Date().toUTCString()
 
+  // Resolved from the deploy environment in astro.config.mjs. Feed readers
+  // store these links permanently, so they have to be the real domain.
+  const url = (path: string) => new URL(path, site).href
+
   const items = posts
     .map((post) => {
-      const link = `${SITE.url}/blog/${post.slug}/`
+      const link = url(`/blog/${post.slug}/`)
       const categories = post.tags
         .map((tag) => `      <category>${escapeXml(tag)}</category>`)
         .join('\n')
@@ -36,11 +40,11 @@ ${categories}
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>${escapeXml(SITE.title)}</title>
-    <link>${SITE.url}</link>
+    <link>${url('/')}</link>
     <description>${escapeXml(SITE.description)}</description>
     <language>en-us</language>
     <lastBuildDate>${buildDate}</lastBuildDate>
-    <atom:link href="${SITE.url}/rss.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="${url('/rss.xml')}" rel="self" type="application/rss+xml" />
 ${items}
   </channel>
 </rss>`

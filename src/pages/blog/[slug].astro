@@ -22,7 +22,7 @@ const { newer, older } = await getAdjacentPosts(post)
 
 const formattedDate = formatDateLong(post.publishedAt)
 
-const shareUrl = new URL(`/blog/${post.slug}/`, Astro.site ?? SITE.url).href
+const shareUrl = new URL(`/blog/${post.slug}/`, Astro.site).href
 ---
 
 <BaseLayout
