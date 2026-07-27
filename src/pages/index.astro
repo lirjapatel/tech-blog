@@ -182,6 +182,32 @@ const featuredDate = featured ? formatDateShort(featured.publishedAt) : ''
     </div>
   </section>
 
+  <!--
+    Netlify Forms registration.
+
+    Netlify's build step scans the *built HTML* for forms carrying
+    `data-netlify`, and registers whatever it finds. The real signup UI is a
+    React island that renders in the browser, which the build step never sees —
+    so this hidden static twin is what actually registers the form. The island
+    then POSTs to it with a matching `form-name`.
+
+    Field names here must match what NewsletterSignup.jsx sends, or Netlify
+    rejects the submission.
+  -->
+  <form
+    name="newsletter"
+    method="POST"
+    data-netlify="true"
+    data-netlify-honeypot="bot-field"
+    hidden
+    aria-hidden="true"
+    tabindex="-1"
+  >
+    <input type="hidden" name="form-name" value="newsletter" />
+    <input type="email" name="email" />
+    <input type="text" name="bot-field" />
+  </form>
+
   <!-- About teaser -->
   <section class="section-pad pt-0" aria-labelledby="about-teaser-heading">
     <div class="shell reveal">

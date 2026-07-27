@@ -1,3 +1,13 @@
 {
-  "extends": "astro/tsconfigs/strict"
+  "extends": "astro/tsconfigs/strict",
+  "//": "Without an explicit include/exclude, TypeScript walks the whole project root. That pulls in public/admin/decap-cms.js — a 5 MB minified vendor bundle fetched at build time — and `astro check` runs out of heap trying to parse it. Scope the program to source we actually author.",
+  "include": [
+    ".astro/types.d.ts",
+    "src/**/*",
+    "tests/**/*",
+    "scripts/**/*",
+    "*.config.mjs",
+    "*.config.ts"
+  ],
+  "exclude": ["node_modules", "dist", "public", ".astro/cache"]
 }

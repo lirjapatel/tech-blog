@@ -132,7 +132,7 @@ test.describe('Feeds and metadata', () => {
     expect(types).toContain('BreadcrumbList')
   })
 
-  test('every post has a generated social card', async ({ page, request }) => {
+  test('every post has a generated social card', async ({ request }) => {
     const index = await (await request.get('/search-index.json')).json()
 
     for (const post of index) {
